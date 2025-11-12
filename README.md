@@ -1,41 +1,102 @@
-# Computer Network Project  
-by Anugrah Pratap Singh, Amarjeet Shukla and Aryan Singh 
+# Network Host Reachability Monitor (Ping Project)
 
-## Table of Contents  
-- [Project Overview](#project-overview)  
-- [Features](#features)  
-- [Getting Started](#getting-started)  
-  - [Prerequisites](#prerequisites)  
-  - [Build & Run](#build-and-run)  
-- [Usage](#usage)  
-- [Project Structure](#project-structure)  
-- [How it Works](#how-it-works)  
-- [Sample Output / Logs](#sample-output-logs)  
-- [Contributing](#contributing)  
-- [License](#license)  
-- [Acknowledgements](#acknowledgements)  
+A simple, cross-platform C++ application designed to continuously monitor the reachability status of a predefined list of network hosts (IPs and domains). It logs host status (UP/DOWN) and generates alerts for any detected outages.
+
+**By:** Anugrah Pratap Singh (Roll No: 2023021112), Amarjeet Shukla (Roll No: 2023021108) and Aryan Gupta(Roll No: 2023021119)
 
 ---
 
-## Project Overview  
-This project is a C++ implementation of a computer-networking assignment. The aim is to simulate/execute ping / packet communications (or whatever your code does) in a network context using sockets / ICMP / or custom logic. The repository contains the source code file (pingproj.cpp), a folder (pingproj) and a log (ping_log.txt) capturing sample runs.
+## Table of Contents
 
-## Features  
-- Sends “ping” requests (or simulated network requests) and logs responses.  
-- Measures round-trip time (RTT) or logs latency information.  
-- Maintains a log file for analysis (ping_log.txt).  
-- Modular code structure to allow extension to other network operations.  
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Build and Run](#build-and-run)
+- [Usage and Host List](#usage-and-host-list)
+- [How It Works](#how-it-works)
+- [Sample Output / Logs](#sample-output--logs)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Getting Started  
+---
 
-### Prerequisites  
-- A C++ compiler (e.g., g++, version supporting C++11 or later)  
-- On Linux/macOS: basic socket permissions (may require root for raw ICMP)  
-- On Windows: equivalent environment (if applicable)  
-- Terminal / Command-line access  
+## Project Overview
 
-### Build & Run  
-1. Clone the repository:  
-   ```bash
-   git clone https://github.com/ANUGRAH555/Computer-Network-Project.git  
-   cd Computer-Network-Project
+This project is a C++ implementation of a continuous network monitoring utility. It acts as a basic health-check tool by regularly sending network requests (via the system's `ping` utility) to various public and local hosts to determine their accessibility. The primary goal is to simulate and execute basic packet communication checks.
+
+## Features
+
+* **Continuous Monitoring:** Runs in an infinite loop, checking host status at a fixed interval of **60 seconds**.
+* **Cross-Platform Ping:** Uses platform-specific `ping` commands for Windows (`ping -n 1`) and Linux/macOS (`ping -c 1`).
+* **Real-time Logging:** Writes a timestamped log entry for every host check to a file named `ping_log.txt`.
+* **Console Output:** Prints the host status (UP/DOWN) directly to the console.
+* **Alerting System:** Displays a clear `⚠️ ALERT` message on the console whenever a host is detected as **DOWN**.
+* **Modular Code:** Written in C++ using standard libraries, allowing for future extension to measure Round-Trip Time (RTT) or integrate other network operations.
+
+## Getting Started
+
+Follow these steps to build and run the network monitor on your machine.
+
+### Prerequisites
+
+* A C++ compiler that supports C++11 or later (e.g., `g++`).
+* The standard `ping` utility installed on your operating system.
+* Terminal / Command-line access.
+* ***Note on Permissions:*** The code relies on the standard system `ping` command.
+
+### Build and Run
+
+1.  **Clone the repository (if applicable) and navigate to the directory:**
+    ```bash
+    git clone [https://github.com/ANUGRAH555/Computer-Network-Project.git](https://github.com/ANUGRAH555/Computer-Network-Project.git) 
+    cd Computer-Network-Project
+    ```
+2.  **Compile the C++ source code:**
+    ```bash
+    g++ pingproj.cpp -o pingproj -std=c++11 -pthread
+    ```
+    *Note: The `-pthread` flag is required because the code uses `std::this_thread::sleep_for`.*
+3.  **Run the executable:**
+    ```bash
+    # On Linux/macOS
+    ./pingproj
+
+    # On Windows (cmd)
+    pingproj.exe
+    ```
+    The program will immediately begin the monitoring process.
+
+## Usage and Host List
+
+The program continuously loops through a predefined list of hosts, performing a single `ping` check on each one.
+
+### Monitored Hosts
+
+The current list of hosts checked in `pingproj.cpp` includes a mix of public DNS servers, popular domains, and common local gateway IPs:
+
+| Type | Hostname / IP | Purpose |
+| :--- | :--- | :--- |
+| **Public DNS** | `8.8.8.8`, `1.1.1.1`, `9.9.9.9`, `208.67.222.222`, `8.8.4.4`, `1.0.0.1` | Primary public/resolver checks. |
+| **Websites** | `google.com`, `cloudflare.com`, `facebook.com`, `youtube.com`, `twitter.com`, `github.com`, `amazon.com`, `microsoft.com`, `apple.com`, `wikipedia.org`, `bing.com`, `reddit.com`, `linkedin.com` | Checks for general internet connectivity. |
+| **Local** | `192.168.1.1`, `192.168.0.1` | Checks for local network gateway reachability. |
+| **Test** | `example.com` | A domain reserved for documentation examples (expected to be always UP). |
+
+To modify the host list, edit the `vector<string> hosts` variable in `pingproj.cpp` and recompile.
+
+## How It Works
+
+The core logic resides in `pingproj.cpp`:
+
+1.  **`main()` loop:** The program enters an infinite `while(true)` loop.
+2.  **`pingHost()` function:** For each host, the function constructs and executes a system command to run a single `ping` packet. It suppresses all `ping` output to the console and checks the exit code. An exit code of `0` means the host is **UP**; any other value means it is **DOWN**.
+3.  **Logging:** The result, along with a timestamp generated by `getTimestamp()`, is appended to `ping_log.txt`.
+4.  **Alerting:** If `pingHost` returns `false` (DOWN), a console alert is printed.
+5.  **Delay:** After checking all hosts, the program pauses for `60` seconds before starting the next cycle.
+
+## Sample Output / Logs
+
+The program produces both console output and writes to `ping_log.txt`.
+
+### Console Output
